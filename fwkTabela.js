@@ -1,35 +1,81 @@
 let tabela = document.getElementsByTagName("tabela");
-for(let i=0;i<tabela.length;i++){
+
+for(let i = 0; i < tabela.length; i++){
+
     let tab = tabela[i];
-    let linhas= tab.getAttribute("linha");
-    let colunas= tab.getAttribute("coluna");
+    let linhas = parseInt(tab.getAttribute("linha"));
+    let colunas = parseInt(tab.getAttribute("coluna"));
 
-    let novaTabela= document.createElement("table");
-    let colspanAttr=tab.getAttribute("colspan");
-    let matriz = colspanAttr.split(";");
-    matriz=matriz.map(l => l.trim());
-    matriz=matriz.map(l => l.split(" ")) ;
-    console.log(matriz);
+    let novaTabela = document.createElement("table");
 
-    for(let x=0;x<linhas;x++){
-        let tr=document.createElement("tr");
-        for(let y=0;y<colunas;y++){
-            let td=document.createElement("td");
-            let span=1;
-            for(let k =0; k<matriz.length;k++){
-                if(matriz[k][0] == x && matriz[k][1]==y){
-                    span=matriz[k][2];
+    let espan = tab.getElementsByTagName("expand");
+
+    let matriz = [];
+
+    for(let j = 0; j < espan.length; j++){
+
+        let linha = espan[j].getAttribute("linha");
+        let coluna = espan[j].getAttribute("coluna");
+        let tamanho = espan[j].getAttribute("tamanho");
+        let tipo = espan[j].getAttribute("tipo");
+
+        matriz.push([linha, coluna, tamanho, tipo]);
+    }
+
+    let quantRowspan = [];
+
+    for(let i = 0; i < colunas; i++){
+        quantRowspan[i] = 0;
+    }
+
+    for(let x = 0; x < linhas; x++){
+
+        let tr = document.createElement("tr");
+
+        for(let y = 0; y < colunas; y++){
+
+            if(quantRowspan[y] > 0){
+                quantRowspan[y]--;
+                continue;
+            }
+
+            let td = document.createElement("td");
+
+            let colspan = 1;
+            let rowspan = 1;
+
+            for(let k = 0; k < matriz.length; k++){
+
+                if(matriz[k][0] == x && matriz[k][1] == y){
+
+                    if(matriz[k][3] == "coluna"){
+                        colspan = parseInt(matriz[k][2]);
+                    }
+
+                    if(matriz[k][3] == "linha"){
+                        rowspan = parseInt(matriz[k][2]);
+                    }
+
                     break;
                 }
             }
-            if(span>1){
-                td.setAttribute("colspan",span);
-            } y         +=span-1;
+
+            if(colspan > 1){
+                td.setAttribute("colspan", colspan);
+            }
+
+            if(rowspan > 1){
+                td.setAttribute("rowspan", rowspan);
+                quantRowspan[y] = rowspan - 1;
+            }
 
             tr.appendChild(td);
+
+            y += colspan - 1;
         }
+
         novaTabela.appendChild(tr);
     }
-    tab.appendChild(novaTabela);
 
+    tab.appendChild(novaTabela);
 }
