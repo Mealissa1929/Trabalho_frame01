@@ -5,10 +5,16 @@ for(let i=0;i<tabela.length;i++){
     let colunas= tab.getAttribute("coluna");
 
     let novaTabela= document.createElement("table");
-    let colspanAttr=tab.getAttribute("colspan");
-    let matriz = colspanAttr.split(";");
-    matriz=matriz.map(l => l.trim());
-    matriz=matriz.map(l => l.split(" ")) ;
+
+    let colspanAttr= document.getElementsByTagName("expand");
+    let matriz=[];
+    for(let w=0; w<colspanAttr.length;w++){
+        matriz.push([
+            colspanAttr[w].getAttribute("linha"),
+            colspanAttr[w].getAttribute("coluna"),
+            colspanAttr[w].getAttribute("tamanho")
+        ]);
+    }
 
     let bordaAttr =  tab.getAttribute("borda");
     let vetBorda = bordaAttr.split(" ");
